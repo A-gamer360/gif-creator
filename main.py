@@ -1,4 +1,3 @@
-import argparse
 from  pathlib import Path
 import subprocess
 import os
@@ -6,18 +5,21 @@ import os
 #set local path and upcoming variables
 inputpath = Path.cwd()
 check = []
-lists = {}
+realpaths = []
+spritepath = []
+framerate = 0
+
 # function creation for easier code writing below.
 def check_gif(): #checks the input folder if there's any gif inside'
     for x in inputpath.glob("input/*.gif"):
-    check.append(x)
+        check.append(x)
     if len(check) == 0:
         print("seems like the input folder does not contain any gif files. please input gif files into the input folder and launch the program again.")
         quit()
 
 def check_png(): #checks the input folder if there's any png inside'
     for x in inputpath.glob("input/*.png"):
-    check.append(x)
+        check.append(x)
     if len(check) == 0:
         print("seems like the input folder does not contain any png files. please input png files into the input folder and launch the program again.")
         quit()
@@ -28,10 +30,10 @@ def output_clear(): #checks the operating system the program runs on to clear th
     else:
         os.system('clear')
 
-def getthemall(str name): #Gathers every sprites if the labelled option is chosen
-    print("files to get : " + name)
-    for animsprite in inputpath.glob("input/cookie*x2_" + anilabel +"_????.png"):
-        print(animsprite)
+def getthemall(name): #Gathers every sprites if the labelled option is chosen
+    global realpaths
+    global spritepath
+    for animsprite in inputpath.glob("input/cookie*x2_" + name +"_????.png"):
         spritepath.append(animsprite)
     for x in spritepath:
         realpaths.append(str(x))
@@ -48,34 +50,66 @@ def labelled_sprites(): #function that proceeds the compilation of sprites if it
     filegroup_name = input()
     filegroup_name = filegroup_name.replace(" ", "_")
     getthemall(filegroup_name)
+    print("now give the FPS value from the associated aniinfo.plist file. (please only add 3 numbers after the dot.)")
+    plist_framerate = float(input())
+    dothemath(plist_framerate)
+    png_2_gif()
 
 def unlabelled_sprites(): #funnction that proceeds the compuilation of sprites if it was not labelled beforehand.
     check_png()
     output_clear()
 
-parser = argparse.ArgumentParser(
-    prog="Manual Cookie Gif Generator",
-    description="Manual compilation of sprites to make a gif, and gives more control over things. requires imagemagick and gifsicle to be installed on your system.",
-    epilog="Made by AGamer360 for cookierun.wiki")
+def base_check(): #checking if the input folder is there or if its empty.
+    for x in inputpath.glob("input/*"):
+        check.append(x)
+    if len(check) == 0:
+        print("Seems like the input folder is empty or non-existant, please create the input folder 'just call it input' and place the sprites (as pngs), or gifs in the input folder, and launch the program again.")
+        quit()
 
-#checking if the input folder is there or if its empty
-for x in inputpath.glob("input/*"):
-    check.append(x)
-if len(check) == 0:
-    print("seems like the input folder is empty or non-existant, please put the sprites or gifs, and launch the program again.")
-    quit()
+def program_check(program):  #Checks if ImageMagick and Gifsicle are installed on the device
+    try:
+        subprocess.run(program, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print(f"it seems that {program[0]} is not installed on your system or is not located in the PATH, please install it and try again.")
+        print("for more informatiion on what is the PATH, please check the tutorial video linked on the github page.")
+        quit()
 
-#intro
-print("Cookie-Gif-Creator")
+def intro(): #intro of the program
+    output_clear()
+    print("Cookie-Gif-Creator")
+    print("By AGamer360 for the CookieRun Wiki")
+    print()
+    print("Type 1 if the sprites in the input folder are labelled, if not, type 2, to compile gifs, type 3.")
+    option = int(input())
+    match option:
+        case 1:
+            labelled_sprites()
+        case 2:
+            unlabelled_sprites()
+        case 3:
+            combine_gif()
+        case _:
+            quit()
 
-print("This vesion will ask everything required as we go, please make sure the sprites are in the input folder, and that ImageMagick and Gifsicle are installed on your device before continuing.")
-print()
-print("Type 1 if the sprites in the input folder are labelled, if not, type 2, to compile gifs, type 3.")
-if input = 1:
-    labelled_sprites()
-if input = 2:
-    unlabelled_sprites()
-if input = 3:!
-    combine_gif()
-else:
-    quit()
+def dothemath(fps): #calculates the fps value for the gif
+    global framerate
+    framerate = ((60*fps)*60)/25
+
+def png_2_gif(): #turns the selection of pngs into a single gif through ImageMagick
+    print("please give the output name for the file")
+    outputname = input()
+    outputname = outputname.replace(" ", "_")
+    if outputname.find('.gif') == -1:
+        outputname = outputname + ".gif"
+    command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputname}"
+    run_imagemagick(command)
+    print("the gif should now be located in the root folder, thanks for using the program!")
+
+def run_imagemagick(cmd):
+    print(cmd)
+    subprocess.call(cmd, shell=True)
+
+base_check()
+program_check(["magick", "--version"])
+program_check(["gifsicle", "--version"])
+intro()
