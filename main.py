@@ -9,6 +9,9 @@ realpaths = []
 spritepath = []
 framerate = 0
 manual_id = []
+gifpath = []
+realgifpath = []
+realgiflocale = []
 
 # function creation for easier code writing below.
 def check_gif(): #checks the input folder if there's any gif inside'
@@ -50,8 +53,40 @@ def getittogether(idlist): #gathers every sprites incated through the label-less
         realpaths.append(str(y))
     realpaths = ' '.join(realpaths)
 
+def getgif(gifname):
+    global gifpath
+    global realgifpath
+    for giflocation in inputpath.glob("input/*" + gifname + ".gif"):
+        gifpath.append(giflocation)
+    for x in gifpath:
+        realgiflocale.append(str(x))
+    gifpath.clear()
+
 def compile_gif(): #funciton that proceeds the compilation of all the gifs in the input folder
     check_gif()
+    x = 1
+    global realgifpath
+    output_clear()
+    print("this will compile multiple gifs into a single image. let's make sure the order of it is the same as in game first.")
+    print("just like the labelled version, this will simply require a bit of the file name for simplicity.")
+    naming = input()
+    naming = naming.replace(" ", "_")
+    getgif(naming)
+    while x == 1:
+        output_clear()
+        print("current gif order listed : ")
+        print(realgiflocale)
+        print("this will compile multiple gifs into a single animation. let's make sure the order of it is the same as in game first.")
+        print("just like the labelled version, this will simply require a bit of the file name for simplicity.")
+        print("type 'done' if you're done with listing the order")
+        naming = input()
+        naming = naming.replace(" ", "_")
+        if naming ==  "done":
+            break
+        realgifpath = ' '.join(realgiflocale)
+        getgif(naming)
+    gifs_2_gif()
+
 
 def labelled_sprites(): #function that proceeds the compilation of sprites if it was labelled beforehand
     check_png()
@@ -91,7 +126,6 @@ def unlabelled_sprites(): #funnction that proceeds the compuilation of sprites i
     dothemath(plist_framerate)
     png_2_gif()
 
-
 def base_check(): #checking if the input folder is there or if its empty.
     for x in inputpath.glob("input/*"):
         check.append(x)
@@ -108,7 +142,7 @@ def program_check(program):  #Checks if ImageMagick and Gifsicle are installed o
         quit()
 
 def intro(): #intro of the program
-    print("Type 1 if the sprites in the input folder are labelled, if not, type 2, to compile gifs, type 3.")
+    print("Type 1 if the sprites in the input folder are labelled, if not, type 2, to compile gifs, type 3. any other number will exit the program.")
     option = int(input())
     match option:
         case 1:
@@ -116,7 +150,7 @@ def intro(): #intro of the program
         case 2:
             unlabelled_sprites()
         case 3:
-            combine_gif()
+            compile_gif()
         case _:
             quit()
 
@@ -124,20 +158,37 @@ def dothemath(fps): #calculates the fps value for the gif
     global framerate
     framerate = ((60*fps)*60)/25
 
+def gifs_2_gif(): #turns the selection of gif into a single gif through ImageMagick and gifsicle
+    print("please give the output name for the file")
+    outputname = input()
+    outputname = outputname.replace(" ", "_")
+    if outputname.find('.gif') == -1:
+        outputname = outputname + ".gif"
+    gifsiclecommand = f"gifsicle {str(realgifpath)} > {outputname}"
+    run_command(gifsiclecommand)
+    magickcommand = f"magick {outputname} -trim -layers trim-bounds {outputname}"
+    run_command(magickcommand)
+    print("the gif should now be located in the root folder, thanks for using the program!")
+
 def png_2_gif(): #turns the selection of pngs into a single gif through ImageMagick
     print("please give the output name for the file")
     outputname = input()
     outputname = outputname.replace(" ", "_")
     if outputname.find('.gif') == -1:
         outputname = outputname + ".gif"
-    command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputname}"
-    run_imagemagick(command)
+    print("is this gif going to combine with other gifs? (input must be True or False)")
+    trimornotrim = bool(input())
+    if trimornotrim == True:
+        command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -channel A -ordered-dither o8x8 {outputname}"
+    else:
+        command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputname}"
+    run_command(command)
     print("the gif should now be located in the root folder, thanks for using the program!")
 
-def run_imagemagick(cmd): # runs ImageMagick
-    print(cmd)
+def run_command(cmd): # runs the final command
     subprocess.call(cmd, shell=True)
 
+#and it starts here
 output_clear()
 print("Cookie-Gif-Creator")
 print("By AGamer360 for the CookieRun Wiki")
@@ -145,5 +196,4 @@ print()
 base_check()
 program_check(["magick", "--version"])
 program_check(["gifsicle", "--version"])
-
 intro()
