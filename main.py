@@ -181,7 +181,9 @@ def png_2_gif(): #turns the selection of pngs into a single gif through ImageMag
     if trimornotrim == True:
         command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -channel A -ordered-dither o8x8 {outputname}"
     else:
-        command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputname}"
+        command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputame}"
+    run_command(command)
+    command = f"magick {outputname} -trim -layers TrimBounds {outputname}"
     run_command(command)
     print("the gif should now be located in the root folder, thanks for using the program!")
 
