@@ -166,8 +166,12 @@ def gifs_2_gif(): #turns the selection of gif into a single gif through ImageMag
     outputname = outputname.replace(" ", "_")
     if outputname.find('.gif') == -1:
         outputname = outputname + ".gif"
-    gifsiclecommand = f"gifsicle {str(realgifpath)} > {outputname}"
-    run_command(gifsiclecommand)
+    if os.name=="nt":
+        gifsiclecommand = f"gifsicle.exe {str(realgifpath)} > {outputname}"
+        run_command(gifsiclecommand)
+    else:
+        gifsiclecommand = f"gifsicle {str(realgifpath)} > {outputname}"
+        run_command(gifsiclecommand)
     magickcommand = f"magick {outputname} -trim -layers TrimBounds {outputname}"
     run_command(magickcommand)
     print("the gif should now be located in the root folder, thanks for using the program!")
