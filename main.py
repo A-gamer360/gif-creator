@@ -188,11 +188,11 @@ def png_2_gif(): #turns the selection of pngs into a single gif through ImageMag
     notrim = int(input())
     match notrim:
         case 1:
-            yestrim()
+            yestrimming()
         case 2:
-            notrim()
+            notrimming()
 
-def notrim(): #section where the gif is not trimmed for gif combination
+def notrimming(): #section where the gif is not trimmed for gif combination
     print("no trim")
     command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -channel A -ordered-dither o8x8 {outputname}"
     run_command(command)
@@ -200,7 +200,7 @@ def notrim(): #section where the gif is not trimmed for gif combination
     print("thanks for using the program!")
     quit()
 
-def yestrim(): # section where the gif is trimmed
+def yestrimming(): # section where the gif is trimmed
     print("yes trim")
     command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputname}"
     run_command(command)
