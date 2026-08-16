@@ -68,7 +68,7 @@ def compile_gif(): #funciton that proceeds the compilation of all the gifs in th
     global realgifpath
     output_clear()
     print("this will compile multiple gifs into a single image. let's make sure the order of it is the same as in game first.")
-    print("just like the labelled version, this will simply require a bit of the file name for simplicity.")
+    print("Make sure that the gifs you want to compile are in the input folder.")
     naming = input()
     naming = naming.replace(" ", "_")
     getgif(naming)
@@ -77,7 +77,7 @@ def compile_gif(): #funciton that proceeds the compilation of all the gifs in th
         print("current gif order listed : ")
         print(realgiflocale)
         print("this will compile multiple gifs into a single animation. let's make sure the order of it is the same as in game first.")
-        print("just like the labelled version, this will simply require a bit of the file name for simplicity.")
+        print("Make sure that the gifs you want to compile are in the input folder.")
         print("type 'done' if you're done with listing the order")
         naming = input()
         naming = naming.replace(" ", "_")
@@ -166,7 +166,7 @@ def gifs_2_gif(): #turns the selection of gif into a single gif through ImageMag
         outputname = outputname + ".gif"
     gifsiclecommand = f"gifsicle {str(realgifpath)} > {outputname}"
     run_command(gifsiclecommand)
-    magickcommand = f"magick {outputname} -trim -layers trim-bounds {outputname}"
+    magickcommand = f"magick {outputname} -trim -layers TrimBounds {outputname}"
     run_command(magickcommand)
     print("the gif should now be located in the root folder, thanks for using the program!")
 
