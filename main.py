@@ -53,10 +53,10 @@ def getittogether(idlist): #gathers every sprites incated through the label-less
         realpaths.append(str(y))
     realpaths = ' '.join(realpaths)
 
-def getgif(gifname):
+def getgif(gifname): #get gif names through a single bit of the name
     global gifpath
     global realgifpath
-    for giflocation in inputpath.glob("input/*" + gifname + ".gif"):
+    for giflocation in inputpath.glob("input/*" + gifname + "*.gif"):
         gifpath.append(giflocation)
     for x in gifpath:
         realgiflocale.append(str(x))
@@ -88,7 +88,6 @@ def compile_gif(): #funciton that proceeds the compilation of all the gifs in th
         realgifpath = ' '.join(realgiflocale)
         getgif(naming)
     gifs_2_gif()
-
 
 def labelled_sprites(): #function that proceeds the compilation of sprites if it was labelled beforehand
     check_png()
@@ -178,21 +177,38 @@ def gifs_2_gif(): #turns the selection of gif into a single gif through ImageMag
 
 def png_2_gif(): #turns the selection of pngs into a single gif through ImageMagick
     print("please give the output name for the file")
+    global outputname
     outputname = input()
     outputname = outputname.replace(" ", "_")
     if outputname.find('.gif') == -1:
         outputname = outputname + ".gif"
-    print("is this gif going to combine with other gifs? (input must be True or False)")
-    trimornotrim = bool(input())
-    if trimornotrim == "True" or "true":
-        command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -channel A -ordered-dither o8x8 {outputname}"
-        run_command(command)
-    else:
-        command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputame}"
-        run_command(command)
-        command = f"magick {outputname} -trim -layers TrimBounds {outputname}"
-        run_command(command)
-    print("the gif should now be located in the root folder, thanks for using the program!")
+    print("is this gif not going to combined with other gifs and therefore should be trimed?")
+    print("1 for Yes, trim the gif as it won't be combined with other gifs'")
+    print("2 for no, trim the gif as it will be combined with other gifs")
+    notrim = int(input())
+    match notrim:
+        case 1:
+            yestrim()
+        case 2:
+            notrim()
+
+def notrim(): #section where the gif is not trimmed for gif combination
+    print("no trim")
+    command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -channel A -ordered-dither o8x8 {outputname}"
+    run_command(command)
+    print("the gif should now be located in the root folder.")
+    print("thanks for using the program!")
+    quit()
+
+def yestrim(): # section where the gif is trimmed
+    print("yes trim")
+    command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -trim -layers trim-bounds -channel A -ordered-dither o8x8 {outputname}"
+    run_command(command)
+    command = f"magick {outputname} -trim -layers trim-bounds {outputname}"
+    run_command(command)
+    print("the gif should now be located in the root folder")
+    print("thanks for using the program!")
+    quit()
 
 def run_command(cmd): # runs the final command
     subprocess.call(cmd, shell=True)
