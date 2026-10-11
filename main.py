@@ -1,6 +1,7 @@
 from  pathlib import Path
 import subprocess
 import os
+import time
 
 #set local path and upcoming variables
 inputpath = Path.cwd()
@@ -177,7 +178,7 @@ def gifs_2_gif(): #turns the selection of gif into a single gif through ImageMag
     magickcommand = f"magick {outputname} -trim -layers TrimBounds {outputname}"
     run_command(magickcommand)
     print("the gif should now be located in the root folder, thanks for using the program!")
-    intro()
+    restar_script()
 
 def png_2_gif(): #turns the selection of pngs into a single gif through ImageMagick
     print("please give the output name for the file")
@@ -187,7 +188,7 @@ def png_2_gif(): #turns the selection of pngs into a single gif through ImageMag
     if outputname.find('.gif') == -1:
         outputname = outputname + ".gif"
     print("is this gif not going to combined with other gifs and therefore should be trimed?")
-    print("1 for Yes, trim the gif as it won't be combined with other gifs'")
+    print("1 for Yes, don't trim the gif as it won't be combined with other gifs'")
     print("2 for no, trim the gif as it will be combined with other gifs")
     notrim = int(input())
     match notrim:
@@ -201,7 +202,7 @@ def notrimming(): #section where the gif is not trimmed for gif combination
     command = f"magick {realpaths} -set delay {str(framerate)} -loop 0 -set dispose 2 -channel A -ordered-dither o8x8 {outputname}"
     run_command(command)
     print("the gif should now be located in the root folder.")
-    intro()
+    restar_script()
 
 def yestrimming(): # section where the gif is trimmed
     print("yes trim")
@@ -210,10 +211,15 @@ def yestrimming(): # section where the gif is trimmed
     command = f"magick {outputname} -trim -layers trim-bounds {outputname}"
     run_command(command)
     print("the gif should now be located in the root folder")
-    intro()
+    restar_script()
 
 def run_command(cmd): # runs the final command
     subprocess.call(cmd, shell=True)
+
+def restar_script(): #restarts the script
+    print("restarting program")
+    time.sleep(2)
+    subprocess.call(f"python main.py", shell=True)
 
 #and it starts here
 output_clear()
