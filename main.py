@@ -84,6 +84,7 @@ def compile_gif(): #funciton that proceeds the compilation of all the gifs in th
         naming = input()
         naming = naming.replace(" ", "_")
         if naming ==  "done":
+            realgifpath = ' '.join(realgiflocale)
             break
         realgifpath = ' '.join(realgiflocale)
         getgif(naming)
@@ -166,10 +167,12 @@ def gifs_2_gif(): #turns the selection of gif into a single gif through ImageMag
     if outputname.find('.gif') == -1:
         outputname = outputname + ".gif"
     if os.name=="nt":
-        gifsiclecommand = f"gifsicle.exe {str(realgifpath)} > {outputname}"
+        gifsiclecommand = f"gifsicle.EXE {str(realgifpath)} > {outputname}"
+        print("gifsiclecommand")
         run_command(gifsiclecommand)
     else:
-        gifsiclecommand = f"gifsicle {str(realgifpath)} > {outputname}"
+        gifsiclecommand = f"/usr/bin/gifsicle {str(realgifpath)} > {outputname}"
+        print(gifsiclecommand)
         run_command(gifsiclecommand)
     magickcommand = f"magick {outputname} -trim -layers TrimBounds {outputname}"
     run_command(magickcommand)
