@@ -144,7 +144,7 @@ def program_check(program):  #Checks if ImageMagick and Gifsicle are installed o
         quit()
 
 def intro(): #intro of the program
-    print("Type 1 if the sprites in the input folder are labelled, if not, type 2, to compile gifs, type 3. any other number will exit the program.")
+    print("Type 1 if the sprites in the input folder are labelled, if not, type 2. To compile gifs, type 3. any other number will exit the program.")
     option = int(input())
     match option:
         case 1:
@@ -168,7 +168,7 @@ def gifs_2_gif(): #turns the selection of gif into a single gif through ImageMag
         outputname = outputname + ".gif"
     if os.name=="nt":
         gifsiclecommand = f"gifsicle.EXE {str(realgifpath)} > {outputname}"
-        print("gifsiclecommand")
+        print(gifsiclecommand)
         run_command(gifsiclecommand)
     else:
         gifsiclecommand = f"/usr/bin/gifsicle {str(realgifpath)} > {outputname}"
