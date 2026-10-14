@@ -2,7 +2,7 @@ from  pathlib import Path
 import subprocess
 import os
 import time
-
+import plistlib
 #set local path and upcoming variables
 inputpath = Path.cwd()
 check = []
@@ -13,6 +13,7 @@ manual_id = []
 gifpath = []
 realgifpath = []
 realgiflocale = []
+checkplist = []
 
 # function creation for easier code writing below.
 def check_gif(): #checks the input folder if there's any gif inside'
@@ -28,6 +29,30 @@ def check_png(): #checks the input folder if there's any png inside'
     if len(check) == 0:
         print("seems like the input folder does not contain any png files. please input png files into the input folder and launch the program again.")
         quit()
+
+def check_plist():
+    global plistpath
+    global isplist
+    plistpath = []
+    for x in inputpath.glob("input/*.plist"):
+        checkplist.append(x)
+        print(checkplist)
+    if len(checkplist) == 0:
+        isplist = False
+    if len(checkplist) == 1:
+        isplist = True
+        for x in checkplist:
+            plistpath.append(str(x))
+        plistpath = ' '.join(plistpath)
+        load_plist()
+    if len(checkplist) >= 2:
+        isplist = False
+
+def load_plist():
+    global aniplst
+    with open(plistpath, "rb") as fp:
+        aniplst = plistlib.load(fp)
+
 
 def output_clear(): #checks the operating system the program runs on to clear the terminal for easier reading
     if os.name=='nt':
@@ -93,14 +118,20 @@ def compile_gif(): #funciton that proceeds the compilation of all the gifs in th
 
 def labelled_sprites(): #function that proceeds the compilation of sprites if it was labelled beforehand
     check_png()
+    check_plist()
     output_clear()
     print("since the sprites already labeled, this will make the job easier to do.")
     print("simply type the name of the sprites you want to compile into a gif.")
     filegroup_name = input()
-    filegroup_name = filegroup_name.replace(" ", "_")
-    getthemall(filegroup_name)
-    print("now give the FPS value from the associated aniinfo.plist file. (please only add 3 numbers after the dot.)")
-    plist_framerate = float(input())
+    filegroup_name_internal = filegroup_name.replace(" ", "_")
+    getthemall(filegroup_name_internal)
+    if not isplist:
+        print("now give the FPS value from the associated aniinfo.plist file. (please only add 3 numbers after the dot.)")
+        plist_framerate = float(input())
+    if isplist:
+        print("plist found")
+        plist_framerate = aniplst['animationlist'][filegroup_name]['FPS']
+        print(plist_framerate)
     dothemath(plist_framerate)
     png_2_gif()
 
